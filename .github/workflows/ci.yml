@@ -52,7 +52,7 @@ jobs:
           echo "VITE_JWT_TOKEN=${{ secrets.JWT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run Tests
-        run: npm test
+        run: npm run test
         working-directory: frontend
 
   deploy:
