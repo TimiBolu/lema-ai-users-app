@@ -11,7 +11,6 @@ import (
 )
 
 func seedDB(db *gorm.DB) error {
-	// Check if the database is already seeded
 	var count int64
 	if err := db.Model(&models.User{}).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to count users: %w", err)
