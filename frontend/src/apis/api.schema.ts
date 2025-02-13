@@ -33,4 +33,13 @@ export const PostSchema = z.object({
   createdAt: z.string(),
 });
 
-export const PostResponseSchema = z.array(PostSchema);
+export const PostResponseSchema = z.object({
+  posts: z.array(PostSchema),
+});
+
+export const ApiResponseSchemaFn = <T extends z.ZodTypeAny>(dataSchema: T) =>
+  z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: dataSchema,
+  });

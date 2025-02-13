@@ -14,6 +14,7 @@ import { server } from "../mocks/server";
 import EnvConfig from "../utils/env.config";
 import { MockData } from "../mocks/mock.data";
 import { renderWithProviders, userEvent, queryClient } from "../test-utils";
+import MockAPIResponse from "../mocks/mock.api.response";
 
 beforeAll(() => {
   MockData.seed();
@@ -31,7 +32,8 @@ describe("PostManager", () => {
     server.use(
       http.get("/api/users/:userId", ({ params }) => {
         const user = MockData.getUser(params.userId as string);
-        return HttpResponse.json(user);
+        const response = MockAPIResponse({ data: user });
+        return HttpResponse.json(response);
       }),
       http.get("/api/posts", ({ request }) => {
         const url = new URL(request.url);
@@ -44,9 +46,12 @@ describe("PostManager", () => {
           );
         }
 
-        return HttpResponse.json(
-          MockData.getPosts().filter((data) => data.userId === userId),
-        );
+        const response = MockAPIResponse({
+          data: {
+            posts: MockData.getPosts().filter((data) => data.userId === userId),
+          },
+        });
+        return HttpResponse.json(response);
       }),
       http.post("/api/posts", async ({ request }) => {
         const { title, body, userId } = (await request.json()) as {
@@ -55,7 +60,8 @@ describe("PostManager", () => {
           userId: string;
         };
         const newPost = MockData.insertPost(title, body, userId);
-        return HttpResponse.json(newPost);
+        const response = MockAPIResponse({ data: newPost });
+        return HttpResponse.json(response);
       }),
       http.delete("/api/posts/:postId", async ({ params }) => {
         MockData.removePost((data) => data.id !== params.postId);

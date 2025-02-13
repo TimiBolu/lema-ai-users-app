@@ -1,17 +1,19 @@
 import EnvConfig from "../utils/env.config";
 import { UsersResponse } from "../types/user";
-import { UsersResponseSchema } from "./api.schema";
+import { ApiResponseSchemaFn, UsersResponseSchema } from "./api.schema";
+import { ApiResponse } from "../types/apiresponse";
 
 export const fetchUsers = async (
   page: number,
   pageSize = 4,
-): Promise<UsersResponse> => {
+): Promise<ApiResponse<UsersResponse>> => {
   const response = await fetch(
     `${EnvConfig.apiBaseUrl}/users?pageNumber=${page}&pageSize=${pageSize}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${EnvConfig.jwtToken}`,
       },
       credentials: "include",
     },
@@ -22,7 +24,7 @@ export const fetchUsers = async (
   }
 
   const data = await response.json();
-  const parsed = UsersResponseSchema.safeParse(data);
+  const parsed = ApiResponseSchemaFn(UsersResponseSchema).safeParse(data);
   if (!parsed.success) {
     throw new Error("Invalid response format");
   }

@@ -18,6 +18,7 @@ import { server } from "../mocks/server";
 import { http, HttpResponse } from "msw";
 import EnvConfig from "../utils/env.config";
 import { MockData } from "../mocks/mock.data";
+import MockAPIResponse from "../mocks/mock.api.response";
 
 beforeAll(() => {
   MockData.seed();
@@ -37,7 +38,8 @@ describe("UsersTable", () => {
         const url = new URL(request.url);
         const pageNumber = url.searchParams.get("pageNumber");
         const pageSize = url.searchParams.get("pageSize");
-        return HttpResponse.json({
+
+        const data = {
           users: Array.from({ length: Number(pageSize) || 10 }, (_, i) => ({
             id: String(i + 1 + (Number(pageNumber) - 1) * 10),
             firstname: `User${i + 1}`,
@@ -58,7 +60,9 @@ describe("UsersTable", () => {
             hasNext: Number(pageNumber) < 2,
             hasPrev: Number(pageNumber) > 1,
           },
-        });
+        };
+        const response = MockAPIResponse({ data });
+        return HttpResponse.json(response);
       }),
     );
   });
