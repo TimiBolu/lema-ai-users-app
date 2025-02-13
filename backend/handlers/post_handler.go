@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type PostHandler struct {
@@ -37,7 +39,11 @@ func (h *PostHandler) GetPostsByUser(w http.ResponseWriter, r *http.Request) {
 
 	posts, err := h.service.GetPostsByUser(r.Context(), reqDTO.UserId)
 	if err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "Failed to get posts by user ID", h.logger, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			SendErrorResponse(w, http.StatusNotFound, "Posts not found", h.logger, err)
+		} else {
+			SendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve posts", h.logger, err)
+		}
 		return
 	}
 
@@ -49,8 +55,7 @@ func (h *PostHandler) GetPostsByUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	// Set request body size limit
-	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB limit
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 	var reqDTO dtos.CreatePostRequestDTO
 	if err := json.NewDecoder(r.Body).Decode(&reqDTO); err != nil {
@@ -63,13 +68,16 @@ func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Sanitize the input fields
 	reqDTO.Title = strings.TrimSpace(reqDTO.Title)
 	reqDTO.Body = strings.TrimSpace(reqDTO.Body)
 
 	newPost, err := h.service.CreatePost(r.Context(), reqDTO.Title, reqDTO.Body, reqDTO.UserID)
 	if err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "Failed to create post", h.logger, err)
+		if errors.Is(err, gorm.ErrForeignKeyViolated) {
+			SendErrorResponse(w, http.StatusNotFound, "User does not exist", h.logger, err)
+		} else {
+			SendErrorResponse(w, http.StatusInternalServerError, "Failed to create post", h.logger, err)
+		}
 		return
 	}
 
@@ -95,7 +103,11 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.DeletePost(r.Context(), reqDTO.ID); err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "Failed to delete post", h.logger, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			SendErrorResponse(w, http.StatusNotFound, "Post not found", h.logger, err)
+		} else {
+			SendErrorResponse(w, http.StatusInternalServerError, "Failed to delete post", h.logger, err)
+		}
 		return
 	}
 

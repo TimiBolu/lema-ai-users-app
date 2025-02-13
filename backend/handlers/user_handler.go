@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"math"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type UserHandler struct {
@@ -27,21 +29,31 @@ func NewUserHandler(service services.UserService, logger *logrus.Logger) *UserHa
 }
 
 func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	var reqDTO dtos.GetUsersRequestDTO
-	pageNumberStr := r.URL.Query().Get("pageNumber")
-	pageSizeStr := r.URL.Query().Get("pageSize")
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("pageNumber"))
+	if err != nil {
+		SendErrorResponse(w, http.StatusBadRequest, "Invalid pageNumber parameter", h.logger, err)
+		return
+	}
 
-	reqDTO.PageNumber, _ = strconv.Atoi(pageNumberStr)
-	reqDTO.PageSize, _ = strconv.Atoi(pageSizeStr)
+	pageSize, err := strconv.Atoi(r.URL.Query().Get("pageSize"))
+	if err != nil {
+		SendErrorResponse(w, http.StatusBadRequest, "Invalid pageSize parameter", h.logger, err)
+		return
+	}
+
+	reqDTO := dtos.GetUsersRequestDTO{
+		PageNumber: pageNumber,
+		PageSize:   pageSize,
+	}
 
 	if err := h.validate.Struct(reqDTO); err != nil {
-		SendErrorResponse(w, http.StatusBadRequest, "Invalid request data", h.logger, err)
+		SendErrorResponse(w, http.StatusBadRequest, "Invalid pagination parameters", h.logger, err)
 		return
 	}
 
 	users, totalUsers, err := h.service.GetUsers(r.Context(), reqDTO.PageNumber, reqDTO.PageSize)
 	if err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "Failed to get users", h.logger, err)
+		SendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve users", h.logger, err)
 		return
 	}
 
@@ -88,7 +100,11 @@ func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.service.GetUserByID(r.Context(), reqDTO.ID)
 	if err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "User not found", h.logger, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			SendErrorResponse(w, http.StatusNotFound, "User not found", h.logger, err)
+		} else {
+			SendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve user", h.logger, err)
+		}
 		return
 	}
 
@@ -110,7 +126,7 @@ func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) GetUsersCount(w http.ResponseWriter, r *http.Request) {
 	count, err := h.service.GetUserCount(r.Context())
 	if err != nil {
-		SendErrorResponse(w, http.StatusInternalServerError, "Failed to get user count", h.logger, err)
+		SendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve user count", h.logger, err)
 		return
 	}
 

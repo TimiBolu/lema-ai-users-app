@@ -7,11 +7,8 @@ import (
 )
 
 func main() {
-	// Initialize logger
-	// Initialize the server environment
 	logger := config.InitEnvSchema()
 
-	// Connect to the database
 	db, err := database.Connect()
 	if err != nil {
 		logger.Fatalf("❌ Failed to connect to the database: %v", err)
