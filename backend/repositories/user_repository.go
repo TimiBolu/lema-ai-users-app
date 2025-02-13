@@ -25,14 +25,12 @@ func (r *userRepository) FindAll(ctx context.Context, page, pageSize int) ([]mod
 	var users []models.User
 	var totalUsers int64
 
-	// Calculate offset
 	offset := (page - 1) * pageSize
 
 	if err := r.db.WithContext(ctx).Model(&models.User{}).Count(&totalUsers).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// Fetch paginated users
 	result := r.db.WithContext(ctx).Preload("Address").Offset(offset).Limit(pageSize).Find(&users)
 	if result.Error != nil {
 		return nil, 0, result.Error

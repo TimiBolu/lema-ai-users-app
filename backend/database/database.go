@@ -18,15 +18,13 @@ func Connect() (*gorm.DB, error) {
 
 	dial := sqlite.Open(dbName)
 
-	// Set GORM logger to log errors and warnings
 	logConfig := logger.Config{
-		SlowThreshold:             time.Second, // Log queries that take longer than 1s
-		LogLevel:                  logger.Warn, // Show only warnings and errors
+		SlowThreshold:             time.Second,
+		LogLevel:                  logger.Warn,
 		IgnoreRecordNotFoundError: true,
 		Colorful:                  false,
 	}
 
-	// Open connection
 	db, err := gorm.Open(dial, &gorm.Config{
 		Logger: logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logConfig),
 	})
@@ -34,22 +32,19 @@ func Connect() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// Configure connection pool settings
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database instance: %w", err)
 	}
 
-	sqlDB.SetMaxIdleConns(10)                 // Max idle connections
-	sqlDB.SetMaxOpenConns(100)                // Max open connections
-	sqlDB.SetConnMaxLifetime(5 * time.Minute) // Connection max lifetime
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
 
-	// AutoMigrate
 	if err := db.AutoMigrate(&models.User{}, &models.Address{}, &models.Post{}); err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %w", err)
 	}
 
-	// Seed the database
 	if err := seedDB(db); err != nil {
 		return nil, fmt.Errorf("failed to seed database: %w", err)
 	}
