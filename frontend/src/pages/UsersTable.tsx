@@ -35,13 +35,13 @@ const UsersTable = () => {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed min-w-[640px]">
               <thead>
                 <tr>
-                  <th className="py-3 pl-6 text-left text-xs font-medium">
+                  <th className="py-3 pl-6 text-left text-xs font-medium min-w-[120px] md:min-w-[150px]">
                     Full Name
                   </th>
-                  <th className="py-3 pl-6 text-left text-xs font-medium">
+                  <th className="py-3 pl-6 text-left text-xs font-medium min-w-[160px] md:min-w-[200px]">
                     Email
                   </th>
                   <th className="py-3 pl-6 text-left text-xs font-medium w-[392px]">
@@ -56,17 +56,11 @@ const UsersTable = () => {
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => navigate({ to: `/users/${user.id}/posts` })}
                   >
-                    <td
-                      className="px-6 py-6 text-sm font-medium truncate overflow-hidden whitespace-nowrap
-                          w-[124px] md:w-[124px] lg:w-[200px]"
-                    >
+                    <td className="px-6 py-6 text-sm font-medium truncate min-w-[120px] md:min-w-[150px]">
                       {`${user.firstname} ${user.lastname}`}
                     </td>
 
-                    <td
-                      className="px-6 py-6 text-sm font-normal truncate overflow-hidden whitespace-nowrap
-                          w-[124px] md:w-[124px] lg:w-[264px]"
-                    >
+                    <td className="px-6 py-6 text-sm font-normal truncate min-w-[160px] md:min-w-[200px]">
                       {user.email}
                     </td>
 

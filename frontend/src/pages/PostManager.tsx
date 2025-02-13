@@ -15,6 +15,9 @@ const PostManager = () => {
   const [body, setBody] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreatingPost, setIsCreatingPost] = useState(false);
+  const [titleError, setTitleError] = useState("");
+  const [bodyError, setBodyError] = useState("");
+  const isPostDisbaled = !title || !body || !!titleError || !!bodyError;
 
   const { userId } = useParams({ strict: false });
   const { data: postsData, refetch, isPending } = usePosts(userId!);
@@ -67,7 +70,7 @@ const PostManager = () => {
         {user?.email} • {noOfPosts} {noOfPosts === 1 ? "Post" : "Posts"}
       </p>
 
-      <div className="flex flex-wrap gap-[23px] w-full justify-center md:justify-start">
+      <div className="flex flex-wrap gap-[23px] w-full justify-center sm:justify-start">
         <EmptyCard onClick={() => setIsModalOpen(true)} />
         {posts?.map((post) => (
           <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
@@ -89,38 +92,79 @@ const PostManager = () => {
             <h2 className="text-2xl sm:text-3xl md:text-[36px]/[43.57px] text-[#181D27] font-[500] mb-4 sm:mb-6 md:mb-[24px]">
               New Post
             </h2>
-            <label
-              className="block text-base sm:text-lg md:text-[18px] font-[500] text-[#535862] mb-2 sm:mb-3 md:mb-[10px]"
-              htmlFor="title"
-            >
-              Post title
-            </label>
-            <input
-              id="title"
-              type="text"
-              placeholder="Give your post a title"
-              className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
-                        text-[400] w-full border border-[#E2E8F0] placeholder-[#94A3B8]
-                        p-2 rounded-[4px] mb-4 sm:mb-6 md:mb-[24px] focus:outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <label
-              className="block text-base sm:text-lg md:text-[18px] font-[500] text-[#535862] mb-2 sm:mb-3 md:mb-[10px]"
-              htmlFor="body"
-            >
-              Post content
-            </label>
-            <textarea
-              id="body"
-              placeholder="Write something mind-blowing"
-              className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
-                        font-[400] w-full border border-[#E2E8F0] h-[140px] sm:h-[160px] md:h-[179px]
-                        placeholder-[#94A3B8] p-2 rounded-[4px] mb-3 sm:mb-4 md:mb-[12px] focus:outline-none"
-              rows={4}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
+
+            <div className="mb-4 sm:mb-6 md:mb-[24px]">
+              <label
+                className="block text-base sm:text-lg md:text-[18px] font-[500] text-[#535862] mb-2 sm:mb-3 md:mb-[10px]"
+                htmlFor="title"
+              >
+                Post title
+              </label>
+              <input
+                id="title"
+                type="text"
+                placeholder="Give your post a title"
+                className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
+                          w-full border border-[#E2E8F0] placeholder-[#94A3B8] p-2 rounded-[4px]
+                          focus:outline-none ${titleError ? 'border-red-500' : 'border-[#E2E8F0]'}"
+                value={title}
+                maxLength={100}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setTitle(value);
+
+                  const isValid = /^[a-zA-Z0-9\s.,!?'"-]+$/.test(value);
+                  setTitleError(
+                    !isValid && value !== ""
+                      ? "Contains invalid special characters"
+                      : "",
+                  );
+                }}
+              />
+              <div className="flex justify-between mt-1">
+                {titleError && (
+                  <span className="text-red-500 text-sm">{titleError}</span>
+                )}
+                <span className="text-sm text-gray-500 ml-auto">
+                  {title.length}/100
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-3 sm:mb-4 md:mb-[12px]">
+              <label
+                className="block text-base sm:text-lg md:text-[18px] font-[500] text-[#535862] mb-2 sm:mb-3 md:mb-[10px]"
+                htmlFor="body"
+              >
+                Post content
+              </label>
+              <textarea
+                id="body"
+                placeholder="Write something mind-blowing"
+                className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
+                          w-full border border-[#E2E8F0] placeholder-[#94A3B8] p-2 rounded-[4px]
+                          focus:outline-none ${bodyError ? 'border-red-500' : 'border-[#E2E8F0]'}"
+                rows={4}
+                value={body}
+                maxLength={500}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setBody(value);
+                  setBodyError(
+                    value.length >= 500 ? "Maximum 500 characters reached" : "",
+                  );
+                }}
+              />
+              <div className="flex justify-between mt-1">
+                {bodyError && (
+                  <span className="text-red-500 text-sm">{bodyError}</span>
+                )}
+                <span className="text-sm text-gray-500 ml-auto">
+                  {body.length}/500
+                </span>
+              </div>
+            </div>
+
             <div className="flex justify-end text-sm sm:text-base md:text-[14px] space-x-3">
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -131,9 +175,9 @@ const PostManager = () => {
               </button>
               <button
                 onClick={handleAddPost}
-                className="flex items-center gap-2 cursor-pointer bg-[#334155] w-fit text-white
-                          font-[600] px-3 sm:px-4 py-1.5 sm:py-2 rounded"
-                disabled={!title || !body}
+                className={`flex items-center gap-2 bg-[#334155] w-fit text-white font-[600] px-3 sm:px-4
+                  py-1.5 sm:py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
+                disabled={isPostDisbaled}
               >
                 <p>Publish</p>
                 {isCreatingPost && (
