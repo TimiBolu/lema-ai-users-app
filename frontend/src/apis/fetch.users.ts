@@ -25,8 +25,6 @@ export const fetchUsers = async (
 
   const data = await response.json();
   const parsed = ApiResponseSchemaFn(UsersResponseSchema).safeParse(data);
-  console.log({ data });
-  console.log({ parsed });
   if (!parsed.success) {
     throw new Error("Invalid response format");
   }
