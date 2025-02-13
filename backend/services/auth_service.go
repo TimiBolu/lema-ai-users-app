@@ -8,8 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// merely serves to issue tokens
-
 // Custom claims structure
 type CustomClaims struct {
 	Username string `json:"username"`
@@ -18,8 +16,7 @@ type CustomClaims struct {
 
 // IssueToken generates a new JWT token with the given claims
 func IssueToken(username string) (string, error) {
-	var jwtSecret = []byte(config.EnvConfig.JWT_SECRET) // Replace with your actual secret key
-	// Set custom claims
+	var jwtSecret = []byte(config.EnvConfig.JWT_SECRET)
 	claims := CustomClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
