@@ -28,7 +28,6 @@ func (r *userRepository) FindAll(ctx context.Context, page, pageSize int) ([]mod
 	// Calculate offset
 	offset := (page - 1) * pageSize
 
-	// Get total count (optional optimization: run only if needed)
 	if err := r.db.WithContext(ctx).Model(&models.User{}).Count(&totalUsers).Error; err != nil {
 		return nil, 0, err
 	}
