@@ -45,6 +45,12 @@ jobs:
         run: npm install
         working-directory: frontend
 
+      - name: Set Environment Variables
+        run: |
+          echo "VITE_APP_API_BASE_URL=http://localhost:8080/api" >> $GITHUB_ENV
+          echo "VITE_APP_ENV=development" >> $GITHUB_ENV
+          echo "VITE_JWT_TOKEN=${{ secrets.JWT_TOKEN }}" >> $GITHUB_ENV
+
       - name: Run Tests
         run: npm test
         working-directory: frontend
