@@ -9,5 +9,5 @@ type User struct {
 	Email     string    `gorm:"not null;unique" json:"email"`
 	Address   Address   `gorm:"foreignKey:UserID" json:"address"`
 	Posts     []Post    `gorm:"foreignKey:UserID" json:"posts"`
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime" json:"createdAt"`
 }

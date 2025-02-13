@@ -23,7 +23,7 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 
 func (r *postRepository) FindByUserID(ctx context.Context, userID string) ([]models.Post, error) {
 	var posts []models.Post
-	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("createdAt DESC").Find(&posts).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("created_at DESC").Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil
