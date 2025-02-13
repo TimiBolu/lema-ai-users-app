@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "vitest",
+    "test": "vite --mode test && vitest",
     "coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.0.4",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-router": "^1.99.13",
+    "dotenv": "^16.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
