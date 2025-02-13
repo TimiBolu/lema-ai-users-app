@@ -6,6 +6,9 @@ export const deletePost = async (postId: string) => {
     const response = await fetch(`${EnvConfig.apiBaseUrl}/posts/${postId}`, {
       method: "DELETE",
       credentials: "include",
+      headers: {
+        Authorization: `Bearer ${EnvConfig.jwtToken}`,
+      },
     });
 
     if (!response.ok) {

@@ -10,12 +10,21 @@ import (
 	"gorm.io/gorm"
 )
 
-func seedDB(db *gorm.DB) {
+func seedDB(db *gorm.DB) error {
+	// Check if the database is already seeded
 	var count int64
-	db.Model(&models.User{}).Count(&count)
+	if err := db.Model(&models.User{}).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to count users: %w", err)
+	}
 	if count > 0 {
 		fmt.Println("Database already seeded")
-		return
+		return nil
+	}
+
+	// Begin a transaction
+	tx := db.Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
 	}
 
 	// Seed 50 users
@@ -23,7 +32,10 @@ func seedDB(db *gorm.DB) {
 	users := make([]models.User, 50)
 	for i := range users {
 		user := models.User{}
-		uuidStr, _ := fkUUID.Hyphenated(reflect.Value{})
+		uuidStr, err := fkUUID.Hyphenated(reflect.Value{})
+		if err != nil {
+			return fmt.Errorf("failed to generate UUID for user: %w", err)
+		}
 		user.ID = uuidStr.(string)
 		user.FirstName = faker.FirstName()
 		user.LastName = faker.LastName()
@@ -34,16 +46,19 @@ func seedDB(db *gorm.DB) {
 	// Seed addresses for each user
 	addresses := make([]models.Address, 50)
 	for i, user := range users {
-		reakAddress := faker.GetRealAddress()
-		uuidStr, _ := fkUUID.Hyphenated(reflect.Value{})
+		realAddress := faker.GetRealAddress()
+		uuidStr, err := fkUUID.Hyphenated(reflect.Value{})
+		if err != nil {
+			return fmt.Errorf("failed to generate UUID for address: %w", err)
+		}
 
 		address := models.Address{
 			ID:      uuidStr.(string),
 			UserID:  user.ID,
-			Street:  reakAddress.Address,
-			City:    reakAddress.City,
-			State:   reakAddress.State,
-			ZipCode: reakAddress.PostalCode,
+			Street:  realAddress.Address,
+			City:    realAddress.City,
+			State:   realAddress.State,
+			ZipCode: realAddress.PostalCode,
 		}
 		addresses[i] = address
 	}
@@ -53,8 +68,14 @@ func seedDB(db *gorm.DB) {
 	fkLorem := faker.Lorem{}
 	for _, user := range users {
 		for i := 0; i < 4; i++ {
-			uuidStr, _ := fkUUID.Hyphenated(reflect.Value{})
-			lorem, _ := fkLorem.Paragraph(reflect.Value{})
+			uuidStr, err := fkUUID.Hyphenated(reflect.Value{})
+			if err != nil {
+				return fmt.Errorf("failed to generate UUID for post: %w", err)
+			}
+			lorem, err := fkLorem.Paragraph(reflect.Value{})
+			if err != nil {
+				return fmt.Errorf("failed to generate lorem paragraph for post: %w", err)
+			}
 			post := models.Post{
 				ID:        uuidStr.(string),
 				UserID:    user.ID,
@@ -66,9 +87,25 @@ func seedDB(db *gorm.DB) {
 		}
 	}
 
-	db.Create(&users)
-	db.Create(&addresses)
-	db.Create(&posts)
+	// Perform bulk inserts within the transaction
+	if err := tx.Create(&users).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to insert users: %w", err)
+	}
+	if err := tx.Create(&addresses).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to insert addresses: %w", err)
+	}
+	if err := tx.Create(&posts).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to insert posts: %w", err)
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
 
 	fmt.Println("Database seeded successfully!")
+	return nil
 }

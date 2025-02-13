@@ -1,12 +1,15 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
+
 	"reflect"
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 type ServerEnvironment string
@@ -21,14 +24,28 @@ type Config struct {
 	DB_NAME         string
 	FRONTEND_APPS   string
 	SERVER_BASE_URL string
+	JWT_SECRET      string
+	XRATE_LIMIT_MAX int
 	APP_ENV         ServerEnvironment
 }
 
-var EnvConfig = Config{}
+var EnvConfig Config
 
-func InitEnvSchema() {
+func InitEnvSchema() *logrus.Logger {
 	loadENV()
+	loadConfig()
+	return initLogger()
+}
 
+func loadENV() {
+	if goEnv := os.Getenv("GO_ENV"); goEnv == "" {
+		if err := godotenv.Load(); err != nil {
+			fmt.Println("No .env file found")
+		}
+	}
+}
+
+func loadConfig() {
 	envConfigReflection := reflect.ValueOf(&EnvConfig).Elem()
 	envConfigType := envConfigReflection.Type()
 
@@ -56,10 +73,10 @@ func InitEnvSchema() {
 	}
 }
 
-func loadENV() {
-	if goEnv := os.Getenv("GO_ENV"); goEnv == "" {
-		if err := godotenv.Load(); err != nil {
-			log.Println("No .env file found")
-		}
-	}
+func initLogger() *logrus.Logger {
+	Logger := logrus.New()
+	Logger.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+	return Logger
 }

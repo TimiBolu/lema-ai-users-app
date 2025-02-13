@@ -1,14 +1,18 @@
+import { ApiResponse } from "../types/apiresponse";
 import { Post } from "../types/post";
 import EnvConfig from "../utils/env.config";
-import { PostResponseSchema } from "./api.schema";
+import { ApiResponseSchemaFn, PostResponseSchema } from "./api.schema";
 
-export const fetchPosts = async (userId: string): Promise<Array<Post>> => {
+export const fetchPosts = async (
+  userId: string,
+): Promise<ApiResponse<{ posts: Array<Post> }>> => {
   const response = await fetch(
     `${EnvConfig.apiBaseUrl}/posts?userId=${userId}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${EnvConfig.jwtToken}`,
       },
       credentials: "include",
     },
@@ -19,7 +23,7 @@ export const fetchPosts = async (userId: string): Promise<Array<Post>> => {
   }
 
   const data = await response.json();
-  const parsed = PostResponseSchema.safeParse(data);
+  const parsed = ApiResponseSchemaFn(PostResponseSchema).safeParse(data);
   if (!parsed.success) {
     throw new Error("Invalid response format");
   }

@@ -1,66 +1,13 @@
-import { FC, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import TrashIcon from "../components/icons/TrashIcon";
-
-import { fetchPosts, deletePost, createPost } from "../apis";
+import { deletePost, createPost } from "../apis";
 import DirectionBtn from "../components/DirectionBtn";
-import { fetchUserById } from "../apis/fetch.user.by.id";
-import AddIcon from "../components/icons/AddIcon";
-import { Post } from "../types/post";
 import Loader from "../components/Loader";
-
-type EmptyCardProps = {
-  onClick: () => void;
-};
-const EmptyCard: FC<EmptyCardProps> = ({ onClick }) => {
-  return (
-    <div
-      onClick={onClick}
-      className="w-[270px] h-[293px] rounded-[8px] flex justify-center items-center cursor-pointer"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23D5D7DAFF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      }}
-    >
-      <div className="flex flex-col items-center gap-[8px]">
-        <AddIcon />
-        <p className="text-[#717680] text-[14px]/[20px] font-[600]">New Post</p>
-      </div>
-    </div>
-  );
-};
-
-type PostCardProps = {
-  post: Post;
-  onDelete: (postId: string) => void;
-};
-const PostCard: FC<PostCardProps> = ({ post, onDelete }) => {
-  return (
-    <div className="relative border-1 border-[#D5D7DA] p-[24px] text-[#535862] w-[270px] h-[293px] rounded-[8px] shadow-[0px_2px_4px_-2px_rgba(10,13,18,0.06),0px_4px_8px_-2px_rgba(10,13,18,0.1)]">
-      <button
-        aria-label={"delete-post-" + post.id}
-        onClick={() => onDelete(post.id)}
-        className="absolute top-[10px] right-[10px] cursor-pointer"
-      >
-        <TrashIcon />
-      </button>
-      <p className="text-[18px]/[20px] font-[500] mb-[1rem]">{post.title}</p>
-      <p
-        className="text-[14px]/[20px]  overflow-hidden text-ellipsis"
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: 9,
-          WebkitBoxOrient: "vertical",
-        }}
-      >
-        {post.body}
-      </p>
-    </div>
-  );
-};
+import PostCard from "../components/PostCard";
+import EmptyCard from "../components/EmptyCard";
+import { usePosts } from "../hooks/usePosts";
+import { useSingleUser } from "../hooks/useSingleUser";
 
 const PostManager = () => {
   const navigate = useNavigate();
@@ -70,19 +17,11 @@ const PostManager = () => {
   const [isCreatingPost, setIsCreatingPost] = useState(false);
 
   const { userId } = useParams({ strict: false });
-  const {
-    data: posts,
-    refetch,
-    isPending,
-  } = useQuery({
-    queryKey: ["posts", userId],
-    queryFn: () => fetchPosts(userId!),
-  });
+  const { data: postsData, refetch, isPending } = usePosts(userId!);
+  const posts = postsData?.data?.posts;
 
-  const { data: user } = useQuery({
-    queryKey: ["user", userId],
-    queryFn: () => fetchUserById(userId!),
-  });
+  const { data: userData } = useSingleUser(userId!);
+  const user = userData?.data;
 
   const handleDeletePost = async (postId: string) => {
     await deletePost(postId);
