@@ -59,7 +59,11 @@ func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	var reqDTO dtos.CreatePostRequestDTO
 	if err := json.NewDecoder(r.Body).Decode(&reqDTO); err != nil {
-		SendErrorResponse(w, http.StatusBadRequest, "Invalid request body", h.logger, err)
+		if err.Error() == "http: request body too large" {
+			SendErrorResponse(w, http.StatusRequestEntityTooLarge, "Request body size exceeded", h.logger, err)
+		} else {
+			SendErrorResponse(w, http.StatusBadRequest, "Invalid request body", h.logger, err)
+		}
 		return
 	}
 
