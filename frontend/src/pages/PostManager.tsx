@@ -84,7 +84,7 @@ const PostManager = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="w-full max-w-[95%] md:max-w-[90%] lg:max-w-[679px] h-auto min-h-[483px]
+            className="w-full md:w-[679px] max-w-[679px] lg:max-w-[679px] h-auto min-h-[483px]
                        bg-white p-4 sm:p-6 md:p-[24px] rounded-[8px]
                        shadow-[0px_4px_8px_-3px_rgba(0,0,0,0.1),1px_10px_20px_-5px_rgba(0,0,0,0.08)]"
             onClick={(e) => e.stopPropagation()}
@@ -104,9 +104,9 @@ const PostManager = () => {
                 id="title"
                 type="text"
                 placeholder="Give your post a title"
-                className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
+                className={`px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
                           w-full border border-[#E2E8F0] placeholder-[#94A3B8] p-2 rounded-[4px]
-                          focus:outline-none ${titleError ? 'border-red-500' : 'border-[#E2E8F0]'}"
+                          focus:outline-none ${titleError ? "border-red-500" : "border-[#E2E8F0]"}`}
                 value={title}
                 maxLength={100}
                 onChange={(e) => {
@@ -141,9 +141,9 @@ const PostManager = () => {
               <textarea
                 id="body"
                 placeholder="Write something mind-blowing"
-                className="px-3 sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
+                className={`px-3 h-[179px]  sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
                           w-full border border-[#E2E8F0] placeholder-[#94A3B8] p-2 rounded-[4px]
-                          focus:outline-none ${bodyError ? 'border-red-500' : 'border-[#E2E8F0]'}"
+                          focus:outline-none ${bodyError ? "border-red-500" : "border-[#E2E8F0]"}`}
                 rows={4}
                 value={body}
                 maxLength={500}
@@ -175,13 +175,13 @@ const PostManager = () => {
               </button>
               <button
                 onClick={handleAddPost}
-                className={`flex items-center gap-2 bg-[#334155] w-fit text-white font-[600] px-3 sm:px-4
+                className={`flex items-end gap-2 bg-[#334155] w-fit text-white font-[600] px-3 sm:px-4
                   py-1.5 sm:py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
                 disabled={isPostDisbaled}
               >
                 <p>Publish</p>
                 {isCreatingPost && (
-                  <Loader color="#FFFFFF" className="mr-[0.5rem] mb-1" />
+                  <Loader color="#FFFFFF" className="mr-[0.5rem]" />
                 )}
               </button>
             </div>
