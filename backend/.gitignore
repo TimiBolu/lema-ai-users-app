@@ -26,7 +26,4 @@ go.work.sum
 .DS_Store
 
 # Generic SQLite patterns
-*.db
-*.sqlite
-*.sqlite3
-*.db3
+test.db

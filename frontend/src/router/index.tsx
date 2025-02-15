@@ -35,12 +35,20 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  validateSearch: (search: Record<string, unknown>): { page: number } => {
+    return {
+      page: Number(search.page) || 1,
+    }
+  },
   component: UsersTable,
 });
 
 const postsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users/$userId/posts",
+  validateSearch: (search: Record<string, unknown>) => ({
+    fromPage: Number(search.fromPage) || 1,
+  }),
   component: PostManager,
 });
 

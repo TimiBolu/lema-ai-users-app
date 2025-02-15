@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 
 import Loader from "../components/Loader";
 
@@ -9,12 +9,19 @@ import Pagination from "../components/Pagination";
 import { useUsers } from "../hooks/useUsers";
 
 const UsersTable = () => {
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
+  const search = useSearch({ from: "/" });
   const { isSmallerScreen } = useWindowSize();
   const [totalPages, setTotalPages] = useState<number | null>(null);
 
   const navigate = useNavigate({ from: "/" });
-  const { isPending, error, data } = useUsers(page);
+  const { isPending, error, data } = useUsers(search.page);
+
+  const handlePageChange = (newPage: number) => {
+    navigate({
+      search: (prev) => ({ ...prev, page: newPage }),
+    });
+  };
 
   useEffect(() => {
     if (data?.data?.pagination?.totalPages) {
@@ -35,7 +42,7 @@ const UsersTable = () => {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
-            <table className="w-full table-fixed min-w-[640px]">
+            <table className="w-full table-fixed min-w-[640px] h-[332px]">
               <thead>
                 <tr>
                   <th className="py-3 pl-6 text-left text-xs font-medium min-w-[120px] md:min-w-[150px]">
@@ -54,10 +61,15 @@ const UsersTable = () => {
                   <tr
                     key={user.id}
                     className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => navigate({ to: `/users/${user.id}/posts` })}
+                    onClick={() => 
+                      navigate({
+                        to: `/users/${user.id}/posts`,
+                        search: { fromPage: search.page },
+                      })
+                    }
                   >
                     <td className="px-6 py-6 text-sm font-medium truncate min-w-[120px] md:min-w-[150px]">
-                      {`${user.firstname} ${user.lastname}`}
+                      {user.name}
                     </td>
 
                     <td className="px-6 py-6 text-sm font-normal truncate min-w-[160px] md:min-w-[200px]">
@@ -65,7 +77,7 @@ const UsersTable = () => {
                     </td>
 
                     <td className="px-6 py-6 text-sm font-normal truncate w-[392px]">
-                      {`${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipCode}`}
+                      {`${user.address.street}, ${user.address.city}, ${user.address.state} ${user.address.zipcode}`}
                     </td>
                   </tr>
                 ))}
@@ -78,8 +90,8 @@ const UsersTable = () => {
       {/* Pagination */}
       <div className="flex w-full justify-end mt-4">
         <Pagination
-          page={page}
-          setPage={setPage}
+          page={search.page}
+          handlePageChange={handlePageChange}
           totalPages={pages}
           isSmallerScreen={isSmallerScreen}
         />

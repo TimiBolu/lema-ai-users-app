@@ -16,8 +16,8 @@ func (suite *UserTestSuite) TestUserHandler_GetUsers() {
 	w := httptest.NewRecorder()
 
 	expectedUsers := []models.User{
-		{ID: uuid1, FirstName: "John", LastName: "Doe"},
-		{ID: uuid2, FirstName: "Jane", LastName: "Doe"},
+		{ID: uuid1, Name: "John Doe", Username: "johndoe"},
+		{ID: uuid2, Name: "Jane Doe", Username: "janedoe"},
 	}
 	totalCount := int64(2)
 
@@ -59,7 +59,7 @@ func (suite *UserTestSuite) TestUserHandler_GetUserByID() {
 
 	req = mux.SetURLVars(req, map[string]string{"id": uuid1})
 
-	expectedUser := &models.User{ID: uuid1, FirstName: "John", LastName: "Doe"}
+	expectedUser := &models.User{ID: uuid1, Name: "John Doe", Username: "johndoe"}
 	suite.mockRepo.On("FindByID", mock.Anything, uuid1).Return(expectedUser, nil)
 
 	suite.userHandler.GetUserByID(w, req)

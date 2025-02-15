@@ -31,7 +31,7 @@ func (r *userRepository) FindAll(ctx context.Context, page, pageSize int) ([]mod
 		return nil, 0, err
 	}
 
-	result := r.db.WithContext(ctx).Preload("Address").Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&users)
+	result := r.db.WithContext(ctx).Preload("Address").Offset(offset).Limit(pageSize).Find(&users)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}

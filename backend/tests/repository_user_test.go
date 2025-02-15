@@ -42,7 +42,7 @@ func (m *MockUserRepository) Count(ctx context.Context) (int64, error) {
 }
 
 func (suite *UserTestSuite) TestUserRepository_FindByID() {
-	expectedUser := &models.User{ID: uuid1, FirstName: "John", LastName: "Doe"}
+	expectedUser := &models.User{ID: uuid1, Name: "John Doe", Username: "johndoe"}
 	suite.mockRepo.On("FindByID", mock.Anything, uuid1).Return(expectedUser, nil)
 	suite.mockRepo.On("FindByID", mock.Anything, uuid2).Return(nil, errors.New("user not found"))
 
@@ -57,8 +57,8 @@ func (suite *UserTestSuite) TestUserRepository_FindByID() {
 
 func (suite *UserTestSuite) TestUserRepository_FindAll() {
 	expectedUsers := []models.User{
-		{ID: uuid1, FirstName: "John", LastName: "Doe"},
-		{ID: uuid2, FirstName: "Jane", LastName: "Doe"},
+		{ID: uuid1, Name: "John Doe", Username: "johndoe"},
+		{ID: uuid2, Name: "Jane Doe", Username: "janedoe"},
 	}
 	totalCount := int64(2)
 
