@@ -41,12 +41,10 @@ func Connect() (*gorm.DB, error) {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(5 * time.Minute)
 
-	// Enable foreign key support
 	if err := db.Exec("PRAGMA foreign_keys = ON").Error; err != nil {
 		return nil, fmt.Errorf("failed to enable foreign keys: %w", err)
 	}
 
-	// Perform full schema migration
 	if err := performSafeMigration(db); err != nil {
 		return nil, fmt.Errorf("failed to perform migration: %w", err)
 	}
@@ -64,7 +62,6 @@ func performSafeMigration(db *gorm.DB) error {
 		return err
 	}
 
-	// Migrate all tables in correct order
 	tables := []struct {
 		name    string
 		model   interface{}
@@ -102,7 +99,6 @@ func performSafeMigration(db *gorm.DB) error {
 }
 
 func migrateTable(db *gorm.DB, tableName string, model interface{}, columns []string) error {
-	// Check if table exists
 	var tableExists bool
 	db.Raw(fmt.Sprintf("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='%s'", tableName)).Scan(&tableExists)
 
@@ -110,18 +106,15 @@ func migrateTable(db *gorm.DB, tableName string, model interface{}, columns []st
 		return db.AutoMigrate(model)
 	}
 
-	// Rename existing table
 	tempTable := tableName + "_old"
 	if err := db.Exec(fmt.Sprintf("ALTER TABLE %s RENAME TO %s", tableName, tempTable)).Error; err != nil {
 		return err
 	}
 
-	// Create new table with current schema
 	if err := db.AutoMigrate(model); err != nil {
 		return err
 	}
 
-	// Copy data with explicit column mapping
 	columnsStr := ""
 	for _, col := range columns {
 		columnsStr += fmt.Sprintf("COALESCE(%s, '') AS %s,", col, col)
@@ -138,7 +131,6 @@ func migrateTable(db *gorm.DB, tableName string, model interface{}, columns []st
 		return fmt.Errorf("failed to copy data to %s: %w", tableName, err)
 	}
 
-	// Drop old table
 	if err := db.Exec(fmt.Sprintf("DROP TABLE %s", tempTable)).Error; err != nil {
 		return err
 	}
