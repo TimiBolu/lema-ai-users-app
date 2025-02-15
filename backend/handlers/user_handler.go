@@ -60,10 +60,11 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	userDTOs := make([]dtos.GetUserResponseDTO, len(users))
 	for i, user := range users {
 		userDTOs[i] = dtos.GetUserResponseDTO{
-			ID:        user.ID,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
+			ID:       user.ID,
+			Name:     user.Name,
+			Username: user.Username,
+			Phone:    user.Phone,
+			Email:    user.Email,
 			Address: dtos.Address{
 				Street:  user.Address.Street,
 				City:    user.Address.City,
@@ -109,10 +110,11 @@ func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respDTO := dtos.GetUserResponseDTO{
-		ID:        user.ID,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
+		ID:       user.ID,
+		Name:     user.Name,
+		Username: user.Username,
+		Phone:    user.Phone,
+		Email:    user.Email,
 		Address: dtos.Address{
 			Street:  user.Address.Street,
 			City:    user.Address.City,

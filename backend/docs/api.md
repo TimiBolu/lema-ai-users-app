@@ -31,15 +31,16 @@ GET /users?pageNumber={pageNumber}&pageSize={pageSize}
   "users": [
     {
       "id": "1",
-      "firstname": "John",
-      "lastname": "Doe",
+      "name": "John Doe",
+      "username": "johndoe",
+      "phone": "+2349066744819",
       "email": "john@example.com",
       "address": {
         "id": "101",
         "street": "123 Main St",
         "city": "Lagos",
         "state": "LA",
-        "zipCode": "10001"
+        "zipcode": "10001"
       }
     }
   ],
@@ -60,15 +61,16 @@ GET /users/{id}
 ```json
 {
   "id": "1",
-  "firstname": "John",
-  "lastname": "Doe",
+  "name": "John Doe",
+  "username": "johndoe",
+  "phone": "+2349066744819",
   "email": "john@example.com",
   "address": {
     "id": "101",
     "street": "123 Main St",
     "city": "Lagos",
     "state": "LA",
-    "zipCode": "10001"
+    "zipcode": "10001"
   }
 }
 ```

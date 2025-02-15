@@ -9,7 +9,7 @@ import (
 )
 
 func (suite *UserTestSuite) TestUserService_GetUserByID() {
-	expectedUser := &models.User{ID: uuid1, FirstName: "John", LastName: "Doe"}
+	expectedUser := &models.User{ID: uuid1, Name: "John Doe", Username: "johndoe"}
 	suite.mockRepo.On("FindByID", mock.Anything, uuid1).Return(expectedUser, nil)
 	suite.mockRepo.On("FindByID", mock.Anything, uuid2).Return(nil, errors.New("user not found"))
 
@@ -24,8 +24,8 @@ func (suite *UserTestSuite) TestUserService_GetUserByID() {
 
 func (suite *UserTestSuite) TestUserService_GetUsers() {
 	expectedUsers := []models.User{
-		{ID: uuid1, FirstName: "John", LastName: "Doe"},
-		{ID: uuid2, FirstName: "Jane", LastName: "Doe"},
+		{ID: uuid1, Name: "John Doe", Username: "johndoe"},
+		{ID: uuid2, Name: "Jane Doe", Username: "janedoe"},
 	}
 	totalCount := int64(2)
 

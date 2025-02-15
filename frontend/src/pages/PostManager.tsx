@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 
 import { deletePost, createPost } from "../apis";
 import DirectionBtn from "../components/DirectionBtn";
@@ -10,6 +10,7 @@ import { usePosts } from "../hooks/usePosts";
 import { useSingleUser } from "../hooks/useSingleUser";
 
 const PostManager = () => {
+  const search = useSearch({ from: "/users/$userId/posts" });
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -58,12 +59,15 @@ const PostManager = () => {
         direction="back"
         text="Back to Users"
         onClick={() => {
-          navigate({ to: "/" });
+          navigate({
+            to: "/",
+            search: { page: search.fromPage },
+          });
         }}
       />
 
       <p className="text-[36px]/[43.57px] text-[#181D27] my-[1rem]">
-        {user?.firstname} {user?.lastname}
+        {user?.name}
       </p>
 
       <p className="text-[#535862] text-[14px]/[20px] mb-[24px]">

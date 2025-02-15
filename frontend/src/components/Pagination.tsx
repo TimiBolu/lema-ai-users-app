@@ -2,14 +2,14 @@ import DirectionBtn from "./DirectionBtn";
 
 const Pagination = ({
   page,
-  setPage,
+  handlePageChange,
   totalPages,
   isSmallerScreen,
 }: {
   page: number;
   totalPages: number;
   isSmallerScreen: boolean;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  handlePageChange: (page: number) => void;
 }) => {
   const getPageNumbers = () => {
     const maxPages = isSmallerScreen ? 4 : 6;
@@ -49,7 +49,8 @@ const Pagination = ({
       <DirectionBtn
         direction="back"
         disabled={page === 1}
-        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+        // onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+        onClick={() => handlePageChange(Math.max(page - 1, 1))}
       />
 
       <div className="w-full flex space-x-2">
@@ -62,7 +63,8 @@ const Pagination = ({
             <button
               key={`page-${num}`}
               aria-label={`Page ${num}`}
-              onClick={() => setPage(num as number)}
+              // onClick={() => setPage(num as number)}
+              onClick={() => handlePageChange(num as number)}
               className={`cursor-pointer px-3 py-1 ${
                 page === num
                   ? "bg-[#F9F5FF] text-[#7F56D9] rounded"
@@ -78,7 +80,8 @@ const Pagination = ({
       <DirectionBtn
         direction="next"
         disabled={page === totalPages}
-        onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+        // onClick={() => handlePageChange((prev) => Math.min(prev + 1, totalPages))}
+        onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
       />
     </div>
   );

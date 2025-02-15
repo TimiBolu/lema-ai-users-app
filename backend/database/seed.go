@@ -36,8 +36,9 @@ func seedDB(db *gorm.DB) error {
 			return fmt.Errorf("failed to generate UUID for user: %w", err)
 		}
 		user.ID = uuidStr.(string)
-		user.FirstName = faker.FirstName()
-		user.LastName = faker.LastName()
+		user.Name = fmt.Sprintf("%s %s", faker.FirstName(), faker.LastName())
+		user.Username = faker.Username()
+		user.Phone = faker.Phonenumber()
 		user.Email = faker.Email()
 		users[i] = user
 	}

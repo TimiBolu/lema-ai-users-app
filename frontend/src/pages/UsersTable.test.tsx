@@ -19,6 +19,7 @@ import { http, HttpResponse } from "msw";
 import EnvConfig from "../utils/env.config";
 import { MockData } from "../mocks/mock.data";
 import MockAPIResponse from "../mocks/mock.api.response";
+import { UsersResponse } from "../types/user";
 
 beforeAll(() => {
   MockData.seed();
@@ -39,17 +40,18 @@ describe("UsersTable", () => {
         const pageNumber = url.searchParams.get("pageNumber");
         const pageSize = url.searchParams.get("pageSize");
 
-        const data = {
+        const data: UsersResponse = {
           users: Array.from({ length: Number(pageSize) || 10 }, (_, i) => ({
             id: String(i + 1 + (Number(pageNumber) - 1) * 10),
-            firstname: `User${i + 1}`,
-            lastname: "Doe",
+            name: `User${i + 1} Doe`,
+            username: "UserDoe",
             email: `user${i + 1}@example.com`,
+            phone: `09066744819`,
             address: {
               street: `${i + 1} Main St`,
               city: "Anytown",
               state: "CA",
-              zipCode: "12345",
+              zipcode: "12345",
             },
           })),
           pagination: {
