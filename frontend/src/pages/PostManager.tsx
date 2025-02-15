@@ -141,7 +141,7 @@ const PostManager = () => {
               <textarea
                 id="body"
                 placeholder="Write something mind-blowing"
-                className={`px-3 h-[179px]  sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
+                className={`resize-none px-3 h-[179px]  sm:px-4 md:px-[1rem] text-sm sm:text-base md:text-[14px]/[21px]
                           w-full border border-[#E2E8F0] placeholder-[#94A3B8] p-2 rounded-[4px]
                           focus:outline-none ${bodyError ? "border-red-500" : "border-[#E2E8F0]"}`}
                 rows={4}
