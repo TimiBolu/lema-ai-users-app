@@ -49,7 +49,7 @@ const UsersTable = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white text-[#535862] divide-y divide-gray-200">
                 {data?.data?.users?.map((user) => (
                   <tr
                     key={user.id}
