@@ -70,4 +70,4 @@ If you would like to contribute to the project, please follow these steps:
 MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## Contact
-For questions or feedback, reach out to **Timi Adesina** at [adeshinatim@gmail.com](mailto:adesinatim@gmail.com).
+For questions or feedback, reach out to **Timi Adesina** at [adesinatim@gmail.com](mailto:adesinatim@gmail.com).
